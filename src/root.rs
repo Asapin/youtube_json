@@ -1,0 +1,235 @@
+use serde::{Deserialize, Serialize};
+use vec1::Vec1;
+use super::{actions::{Action, OptionalAction}, header::Header, participants::ParticipantsList};
+
+#[derive(Deserialize, Debug)]
+#[serde(rename_all(deserialize = "camelCase"))]
+pub struct InitialChatJson {
+    pub contents: Option<ChatContents>,
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(rename_all(deserialize = "camelCase"))]
+pub struct ChatContents {
+    pub live_chat_renderer: LiveChat,
+}
+
+#[derive(Debug)]
+pub struct LiveChat {
+    pub continuations: Vec1<Continuation>,
+    pub actions: Option<Vec1<Action>>,
+    pub participants_list: Option<ParticipantsList>,
+    pub header: Option<Header>
+}
+
+impl<'de> Deserialize<'de> for LiveChat {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de> 
+    {
+        #[derive(Deserialize)]
+        #[serde(rename_all(deserialize = "camelCase"))]
+        struct Inner {
+            continuations: Vec1<Continuation>,
+            actions: Option<Vec1<OptionalAction>>,
+            participants_list: Option<ParticipantsList>,
+            header: Option<Header>
+        }
+
+        let inner: Inner = Inner::deserialize(deserializer)?;
+
+        let actions = match inner.actions {
+            Some(actions) => {
+                let actions: Vec<Action> = actions
+                    .into_iter()
+                    .filter_map(|action| {
+                        match action {
+                            OptionalAction::Action(action) => Option::Some(action),
+                            OptionalAction::None => Option::None
+                        }
+                    })
+                    .collect();
+                if actions.is_empty() {
+                    None
+                } else {
+                    Some(actions)
+                }
+            }
+            None => Option::None
+        };
+
+        let actions = match actions {
+            Some(actions) => {
+                let vec1_actions = vec1::Vec1::try_from_vec(actions)
+                    .map_err(|_e| serde::de::Error::custom("Couldn't create vec1 from vec of actions"))?;
+                Some(vec1_actions)
+            },
+            None => None
+        };
+
+        Ok(
+            LiveChat {
+                continuations: inner.continuations,
+                actions,
+                participants_list: inner.participants_list,
+                header: inner.header
+            }
+        )
+    }
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(rename_all(deserialize = "camelCase"))]
+pub struct ChatJson {
+    pub continuation_contents: Option<ContinuationContents>,
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(rename_all(deserialize = "camelCase"))]
+pub struct ContinuationContents {
+    pub live_chat_continuation: LiveChat,
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(rename_all(deserialize = "camelCase"))]
+pub enum Continuation {
+    #[serde(rename_all(deserialize = "camelCase"))]
+    TimedContinuationData {
+        timeout_ms: u16,
+        continuation: String,
+    },
+    #[serde(rename_all(deserialize = "camelCase"))]
+    InvalidationContinuationData {
+        timeout_ms: u16,
+        continuation: String,
+    },
+    #[serde(rename_all(deserialize = "camelCase"))]
+    ReloadContinuationData {
+        continuation: String,
+    }
+}
+
+impl Continuation {
+    pub fn get_timeout_and_continuation(self) -> (u16, String) {
+        match self {
+            Continuation::TimedContinuationData { timeout_ms, continuation } => (timeout_ms, continuation),
+            Continuation::InvalidationContinuationData { timeout_ms, continuation } => (timeout_ms, continuation),
+            Continuation::ReloadContinuationData { continuation } => (0, continuation)
+        }
+    }
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct YoutubeParams {
+    context: ParamsContext,
+    continuation: String,
+    web_client_info: WebClientInfo
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ParamsContext {
+    client: ClientParams,
+    request: RequestParams,
+    #[serde(default = "YoutubeParams::default_user")]
+    user: UserParams,
+    #[serde(default = "YoutubeParams::default_screen_nonce")]
+    client_screen_nonce: String
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ClientParams {
+    hl: String,
+    gl: String,
+    visitor_data: String,
+    user_agent: String,
+    client_name: String,
+    client_version: String,
+    os_name: String,
+    os_version: String,
+    browser_name: String,
+    browser_version: String,
+    #[serde(default = "YoutubeParams::default_screen_width")]
+    screen_width_points: u16,
+    #[serde(default = "YoutubeParams::default_screen_height")]
+    screen_height_points: u16,
+    #[serde(default = "YoutubeParams::default_pixel_density")]
+    screen_pixel_density: u16,
+    #[serde(default = "YoutubeParams::default_utc_offset")]
+    utc_offset_minutes: i16,
+    #[serde(default = "YoutubeParams::default_interface_theme")]
+    user_interface_theme: String,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct RequestParams {
+    session_id: String,
+    #[serde(default = "Vec::new")]
+    internal_experiment_flags: Vec<String>,
+    #[serde(default = "Vec::new")]
+    consistency_tokens_jars: Vec<String>,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct UserParams {}
+
+#[derive(Deserialize, Serialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct WebClientInfo {
+    is_document_hidden: bool
+}
+
+impl YoutubeParams {
+    pub fn new_youtube_params(context: ParamsContext) -> YoutubeParams {
+        let web_client_info = WebClientInfo {
+            is_document_hidden: false
+        };
+
+        YoutubeParams {
+            context,
+            continuation: "".to_string(),
+            web_client_info
+        }
+    }
+
+    pub fn update_event_id(mut self, event_id: String) -> YoutubeParams {
+        self.context.client_screen_nonce = event_id;
+        self
+    }
+
+    pub fn update_continuation(&mut self, continuation: String) {
+        self.continuation = continuation;
+    }
+
+    fn default_screen_width() -> u16 {
+        401
+    }
+
+    fn default_screen_height() -> u16 {
+        566
+    }
+
+    fn default_pixel_density() -> u16 {
+        1
+    }
+
+    fn default_utc_offset() -> i16 {
+        0
+    }
+
+    fn default_interface_theme() -> String {
+        "USER_INTERFACE_THEME_LIGHT".to_string()
+    }
+
+    fn default_user() -> UserParams {
+        UserParams {}
+    }
+
+    fn default_screen_nonce() -> String {
+        "".to_string()
+    }
+}
