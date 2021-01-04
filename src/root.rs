@@ -138,6 +138,12 @@ pub struct ParamsContext {
     client_screen_nonce: String
 }
 
+impl ParamsContext {
+    pub fn update_event_id(&mut self, event_id: String) {
+        self.client_screen_nonce = event_id;
+    }
+}
+
 #[derive(Deserialize, Serialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct ClientParams {
@@ -197,7 +203,7 @@ impl YoutubeParams {
     }
 
     pub fn update_event_id(mut self, event_id: String) -> YoutubeParams {
-        self.context.client_screen_nonce = event_id;
+        self.context.update_event_id(event_id);
         self
     }
 
