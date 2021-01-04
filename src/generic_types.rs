@@ -224,3 +224,15 @@ pub struct AuthorInfo {
     pub author_external_channel_id: String,
     pub author_badges: Option<Vec1<AuthorBadge>>,
 }
+
+#[derive(Deserialize, Debug)]
+#[serde(rename_all(deserialize = "camelCase"))]
+pub struct ContextMenu {
+    live_chat_item_context_menu_endpoint: ContextMenuEndpoint
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(rename_all(deserialize = "camelCase"))]
+pub struct ContextMenuEndpoint {
+    params: String
+}

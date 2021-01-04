@@ -1,5 +1,7 @@
 use serde::Deserialize;
 use std::{fmt::Display, str::FromStr};
+use crate::generic_types::ContextMenu;
+
 use super::generic_types::{SimpleText, Message, AuthorInfo, Image};
 
 #[derive(Debug)]
@@ -229,6 +231,7 @@ pub enum MessageItem {
         message: Message,
         #[serde(flatten)]
         author_info: AuthorInfo,
+        context_menu_endpoint: ContextMenu
     },
     #[serde(rename_all(deserialize = "camelCase"))]
     LiveChatMembershipItemRenderer {
