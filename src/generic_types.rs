@@ -228,11 +228,11 @@ pub struct AuthorInfo {
 #[derive(Deserialize, Debug)]
 #[serde(rename_all(deserialize = "camelCase"))]
 pub struct ContextMenu {
-    live_chat_item_context_menu_endpoint: ContextMenuEndpoint
+    pub live_chat_item_context_menu_endpoint: ContextMenuEndpoint
 }
 
 #[derive(Deserialize, Debug)]
 #[serde(rename_all(deserialize = "camelCase"))]
 pub struct ContextMenuEndpoint {
-    params: String
+    pub params: String
 }
