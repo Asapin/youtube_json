@@ -148,6 +148,10 @@ impl ParamsContext {
     pub fn update_referer(&mut self, referer: String) {
         self.client.main_app_web_info.graft_url = referer;
     }
+
+    pub fn get_mut_ad_signals_info(&mut self) -> &mut AdSignalsInfo {
+        &mut self.ad_signals_info
+    }
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -199,6 +203,16 @@ pub struct UserParams {}
 #[serde(rename_all = "camelCase")]
 pub struct AdSignalsInfo {
     params: Vec<CustomParams>
+}
+
+impl AdSignalsInfo {
+    pub fn add_param(&mut self, custom_param: CustomParams) {
+        self.params.push(custom_param);
+    }
+
+    pub fn clear_params(&mut self) {
+        self.params = Vec::new();
+    }
 }
 
 #[derive(Deserialize, Serialize, Debug)]
