@@ -135,7 +135,9 @@ pub struct ParamsContext {
     #[serde(default = "YoutubeParams::default_user")]
     user: UserParams,
     #[serde(default = "YoutubeParams::default_screen_nonce")]
-    client_screen_nonce: String
+    client_screen_nonce: String,
+    #[serde(default = "YoutubeParams::ad_signals_info")]
+    ad_signals_info: AdSignalsInfo
 }
 
 impl ParamsContext {
@@ -174,7 +176,9 @@ pub struct ClientParams {
     #[serde(default = "YoutubeParams::default_interface_theme")]
     user_interface_theme: String,
     #[serde(default = "YoutubeParams::default_app_web_info")]
-    main_app_web_info: MainAppWebInfo
+    main_app_web_info: MainAppWebInfo,
+    #[serde(default = "YoutubeParams::default_time_zone")]
+    time_zone: String
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -184,12 +188,25 @@ pub struct RequestParams {
     #[serde(default = "Vec::new")]
     internal_experiment_flags: Vec<String>,
     #[serde(default = "Vec::new")]
-    consistency_tokens_jars: Vec<String>,
+    consistency_token_jars: Vec<String>,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct UserParams {}
+
+#[derive(Deserialize, Serialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct AdSignalsInfo {
+    params: Vec<CustomParams>
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct CustomParams {
+    key: String,
+    value: String
+}
 
 #[derive(Deserialize, Serialize, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -264,6 +281,16 @@ impl YoutubeParams {
     fn default_app_web_info() -> MainAppWebInfo {
         MainAppWebInfo {
             graft_url: "".to_string()
+        }
+    }
+
+    fn default_time_zone() -> String {
+        "Europe/London".to_string()
+    }
+
+    fn ad_signals_info() -> AdSignalsInfo {
+        AdSignalsInfo {
+            params: Vec::new()
         }
     }
 }
