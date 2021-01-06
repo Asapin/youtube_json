@@ -142,6 +142,10 @@ impl ParamsContext {
     pub fn update_event_id(&mut self, event_id: String) {
         self.client_screen_nonce = event_id;
     }
+
+    pub fn update_referer(&mut self, referer: String) {
+        self.client.main_app_web_info.graft_url = referer;
+    }
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -163,10 +167,14 @@ pub struct ClientParams {
     screen_height_points: u16,
     #[serde(default = "YoutubeParams::default_pixel_density")]
     screen_pixel_density: u16,
+    #[serde(default = "YoutubeParams::screen_density_float")]
+    screen_density_float: f32,
     #[serde(default = "YoutubeParams::default_utc_offset")]
     utc_offset_minutes: i16,
     #[serde(default = "YoutubeParams::default_interface_theme")]
     user_interface_theme: String,
+    #[serde(default = "YoutubeParams::default_app_web_info")]
+    main_app_web_info: MainAppWebInfo
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -187,6 +195,12 @@ pub struct UserParams {}
 #[serde(rename_all = "camelCase")]
 pub struct WebClientInfo {
     is_document_hidden: bool
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct MainAppWebInfo {
+    graft_url: String
 }
 
 impl YoutubeParams {
@@ -211,6 +225,10 @@ impl YoutubeParams {
         self.continuation = continuation;
     }
 
+    pub fn update_referer(&mut self, referer: String) {
+        self.context.update_referer(referer);
+    }
+
     fn default_screen_width() -> u16 {
         401
     }
@@ -221,6 +239,10 @@ impl YoutubeParams {
 
     fn default_pixel_density() -> u16 {
         1
+    }
+
+    fn screen_density_float() -> f32 {
+        1.0
     }
 
     fn default_utc_offset() -> i16 {
@@ -237,5 +259,11 @@ impl YoutubeParams {
 
     fn default_screen_nonce() -> String {
         "".to_string()
+    }
+
+    fn default_app_web_info() -> MainAppWebInfo {
+        MainAppWebInfo {
+            graft_url: "".to_string()
+        }
     }
 }
