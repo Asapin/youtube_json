@@ -206,8 +206,13 @@ pub struct AdSignalsInfo {
 }
 
 impl AdSignalsInfo {
-    pub fn add_param(&mut self, custom_param: CustomParams) {
-        self.params.push(custom_param);
+    pub fn add_param(&mut self, key: String, value: String) {
+        let param = CustomParams {
+            key,
+            value
+        };
+
+        self.params.push(param);
     }
 
     pub fn clear_params(&mut self) {
