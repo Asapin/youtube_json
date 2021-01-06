@@ -134,15 +134,15 @@ pub struct ParamsContext {
     request: RequestParams,
     #[serde(default = "YoutubeParams::default_user")]
     user: UserParams,
-    #[serde(default = "YoutubeParams::default_screen_nonce")]
-    client_screen_nonce: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    client_screen_nonce: Option<String>,
     #[serde(default = "YoutubeParams::ad_signals_info")]
     ad_signals_info: AdSignalsInfo
 }
 
 impl ParamsContext {
     pub fn update_event_id(&mut self, event_id: String) {
-        self.client_screen_nonce = event_id;
+        self.client_screen_nonce = Some(event_id);
     }
 
     pub fn update_referer(&mut self, referer: String) {
@@ -305,10 +305,6 @@ impl YoutubeParams {
 
     fn default_user() -> UserParams {
         UserParams {}
-    }
-
-    fn default_screen_nonce() -> String {
-        "".to_string()
     }
 
     fn default_app_web_info() -> MainAppWebInfo {
