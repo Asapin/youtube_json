@@ -152,6 +152,10 @@ impl ParamsContext {
     pub fn get_mut_ad_signals_info(&mut self) -> &mut AdSignalsInfo {
         &mut self.ad_signals_info
     }
+
+    pub fn get_client_params(&self) -> &ClientParams {
+        &self.client
+    }
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -183,6 +187,16 @@ pub struct ClientParams {
     main_app_web_info: MainAppWebInfo,
     #[serde(default = "YoutubeParams::default_time_zone")]
     time_zone: String
+}
+
+impl ClientParams {
+    pub fn height(&self) -> u16 {
+        self.screen_height_points
+    }
+
+    pub fn width(&self) -> u16 {
+        self.screen_width_points
+    }
 }
 
 #[derive(Deserialize, Serialize, Debug)]

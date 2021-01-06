@@ -21,6 +21,8 @@ pub type InitialChatJson = root::InitialChatJson;
 pub type ChatJson = root::ChatJson;
 pub type ParamsContext = root::ParamsContext;
 pub type YoutubeParams = root::YoutubeParams;
+pub type AdSignalsInfo = root::AdSignalsInfo;
+pub type ClientParams = root::ClientParams;
 
 pub struct Youtube;
 
