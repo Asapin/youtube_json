@@ -156,6 +156,18 @@ impl ParamsContext {
     pub fn get_client_params(&self) -> &ClientParams {
         &self.client
     }
+
+    pub fn set_connection_type(&mut self, connection_type: Option<String>) {
+        self.client.connection_type = connection_type;
+    }
+
+    pub fn height(&self) -> u16 {
+        self.client.screen_height_points
+    }
+
+    pub fn width(&self) -> u16 {
+        self.client.screen_width_points
+    }
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -189,20 +201,6 @@ pub struct ClientParams {
     main_app_web_info: MainAppWebInfo,
     #[serde(default = "YoutubeParams::default_time_zone")]
     time_zone: String
-}
-
-impl ClientParams {
-    pub fn height(&self) -> u16 {
-        self.screen_height_points
-    }
-
-    pub fn width(&self) -> u16 {
-        self.screen_width_points
-    }
-
-    pub fn set_connection_type(&mut self, connection_type: Option<String>) {
-        self.connection_type = connection_type;
-    }
 }
 
 #[derive(Deserialize, Serialize, Debug)]
