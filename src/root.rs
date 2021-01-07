@@ -136,6 +136,8 @@ pub struct ParamsContext {
     user: UserParams,
     #[serde(skip_serializing_if = "Option::is_none")]
     client_screen_nonce: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    click_tracking: Option<ClickTracking>,
     #[serde(default = "YoutubeParams::ad_signals_info")]
     ad_signals_info: AdSignalsInfo
 }
@@ -167,6 +169,25 @@ impl ParamsContext {
 
     pub fn width(&self) -> u16 {
         self.client.screen_width_points
+    }
+
+    pub fn get_visitor_data<'a>(&'a self) -> &'a str {
+        &self.client.visitor_data
+    }
+
+    pub fn set_click_tracking(&mut self, param: Option<String>) {
+        match param {
+            Some(param) => {
+                self.click_tracking = Some(
+                    ClickTracking {
+                        click_tracking_params: param
+                    }
+                );
+            }
+            None => {
+                self.click_tracking = None;
+            }
+        }
     }
 }
 
@@ -216,6 +237,12 @@ pub struct RequestParams {
 #[derive(Deserialize, Serialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct UserParams {}
+
+#[derive(Deserialize, Serialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ClickTracking {
+    click_tracking_params: String
+}
 
 #[derive(Deserialize, Serialize, Debug)]
 #[serde(rename_all = "camelCase")]
