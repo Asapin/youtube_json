@@ -141,8 +141,8 @@ pub struct ParamsContext {
 }
 
 impl ParamsContext {
-    pub fn update_event_id(&mut self, event_id: String) {
-        self.client_screen_nonce = Some(event_id);
+    pub fn update_event_id(&mut self, event_id: Option<String>) {
+        self.client_screen_nonce = event_id;
     }
 
     pub fn update_referer(&mut self, referer: String) {
@@ -183,6 +183,8 @@ pub struct ClientParams {
     utc_offset_minutes: i16,
     #[serde(default = "YoutubeParams::default_interface_theme")]
     user_interface_theme: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    connection_type: Option<String>,
     #[serde(default = "YoutubeParams::default_app_web_info")]
     main_app_web_info: MainAppWebInfo,
     #[serde(default = "YoutubeParams::default_time_zone")]
@@ -196,6 +198,10 @@ impl ClientParams {
 
     pub fn width(&self) -> u16 {
         self.screen_width_points
+    }
+
+    pub fn set_connection_type(&mut self, connection_type: Option<String>) {
+        self.connection_type = connection_type;
     }
 }
 
@@ -266,7 +272,7 @@ impl YoutubeParams {
         }
     }
 
-    pub fn update_event_id(mut self, event_id: String) -> YoutubeParams {
+    pub fn update_event_id(mut self, event_id: Option<String>) -> YoutubeParams {
         self.context.update_event_id(event_id);
         self
     }
