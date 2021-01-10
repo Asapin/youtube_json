@@ -127,7 +127,7 @@ pub struct YoutubeParams {
     web_client_info: WebClientInfo
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ParamsContext {
     client: ClientParams,
@@ -191,7 +191,7 @@ impl ParamsContext {
     }
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ClientParams {
     hl: String,
@@ -224,7 +224,7 @@ pub struct ClientParams {
     time_zone: String
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct RequestParams {
     session_id: String,
@@ -234,17 +234,17 @@ pub struct RequestParams {
     consistency_token_jars: Vec<String>,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct UserParams {}
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ClickTracking {
     click_tracking_params: String
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct AdSignalsInfo {
     params: Vec<CustomParams>
@@ -265,7 +265,7 @@ impl AdSignalsInfo {
     }
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct CustomParams {
     key: String,
@@ -278,7 +278,7 @@ pub struct WebClientInfo {
     is_document_hidden: bool
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct MainAppWebInfo {
     graft_url: String
