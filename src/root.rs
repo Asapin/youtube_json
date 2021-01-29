@@ -227,7 +227,7 @@ pub struct ClientParams {
 #[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct RequestParams {
-    session_id: String,
+    session_id: Option<String>,
     #[serde(default = "Vec::new")]
     internal_experiment_flags: Vec<String>,
     #[serde(default = "Vec::new")]
